@@ -7,8 +7,8 @@ namespace Pokedex.Library.Processors
     {
         public static async Task<PokemonModel> LoadPokemon(string name)
         {
-            const string _baseUrl = "https://pokeapi.co/api/v2/pokemon/";
-            string url = $"{_baseUrl}/{name}";
+            const string baseUrl = "https://pokeapi.co/api/v2/pokemon/";
+            string url = $"{baseUrl}/{name}";
 
             using (HttpResponseMessage response = await ApiHelper.ApiClient.GetAsync(url))
             {
@@ -27,8 +27,8 @@ namespace Pokedex.Library.Processors
 
         public static async Task<SpeciesModel> LoadSpecies(int id)
         {
-            const string _baseUrl = "https://pokeapi.co/api/v2/pokemon-species/";
-            string url = $"{_baseUrl}/{id}";
+            const string baseUrl = "https://pokeapi.co/api/v2/pokemon-species/";
+            string url = $"{baseUrl}/{id}";
 
             using (HttpResponseMessage response = await ApiHelper.ApiClient.GetAsync(url))
             {

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Pokedex.Library.Models;
 using Pokedex.Library.Processors;
+using Pokedex.Library.Utilities;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -11,53 +12,33 @@ namespace FunPokedex.WebAPI.Controllers
     [ApiController]
     public class FunPokedexController : ControllerBase
     {
-        // GET api/<FunPokedexController>/5
-        [HttpGet("{name}")]
-        public async Task<PokemonBasicInfo> GetBasicInfo(string name)
-        {
-            try
-            {
-                var pokemon = await PokemonProcessor.LoadPokemon(name); // NOTE We need the pokemon ID to get the species.
-                var species = await PokemonProcessor.LoadSpecies(pokemon.id);
-                
-                var resultName = pokemon.name;
-                var resultDescription = species.flavor_text_entries[0].flavor_text
-                    .Replace("\n", " ")     // NOTE We need to replace the newline character with a space.
-                    .Replace("\f", "");     // NOTE We need to replace the \f escape character with an empty character. 
-                var resultHabitat = species.habitat.name;
-                var resultIsLegendary = species.is_legendary;
-
-                return new PokemonBasicInfo(name, resultDescription, resultHabitat, resultIsLegendary);
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
-
+        /// <summary>
+        /// Get the basic information of a Pokemon with translated description.
+        /// </summary>
+        /// <param name="name">Name of the Pokemon</param>
+        /// <returns></returns>
         [HttpGet("translated/{name}")]
         public async Task<PokemonBasicInfo> GetBasicInfoTranslated(string name)
         {
             try
             {
-                var pockemon = await PokemonProcessor.LoadPokemon(name);
-                var species = await PokemonProcessor.LoadSpecies(pockemon.id);
+                var pokemon = await PokemonProcessor.LoadPokemon(name);
+                var species = await PokemonProcessor.LoadSpecies(pokemon.id);
 
-                var resultName = pockemon.name;
-                var resultDescription = species.flavor_text_entries[0].flavor_text
-                    .Replace("\n", " ")
-                    .Replace("\f", "");
+                // Extracting the necessary information from the API response.
+                var resultName = pokemon.name;
+                var resultDescription = StringCleaner.RemoveEscapeSequences(species.flavor_text_entries[0].flavor_text);
                 var resultHabitat = species.habitat.name;
                 var resultIsLegendary = species.is_legendary;
                 
+                // Setting the translator based on the habitat and legendary status.
                 string translator = ETranslator.Shakespeare.ToString();
-                if (resultHabitat == "cave" || resultIsLegendary is true)
+                if (resultHabitat == EHabitat.Cave.ToString() || resultIsLegendary is true)
                     translator = ETranslator.Yoda.ToString();
                 
                 var translatedDescription = await TranslatorProcessor.LoadTranslation(resultDescription, translator);
 
-                return new PokemonBasicInfo(name, translatedDescription.contents.translated, resultHabitat, resultIsLegendary);
+                return new PokemonBasicInfo(pokemon.name, translatedDescription.contents.translated, resultHabitat, resultIsLegendary);
             }
             catch (Exception)
             {
