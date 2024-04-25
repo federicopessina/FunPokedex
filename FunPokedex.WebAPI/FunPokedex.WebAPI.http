@@ -1,0 +1,6 @@
+@FunPokedex.WebAPI_HostAddress = http://localhost:5031
+
+GET {{FunPokedex.WebAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
