@@ -1,7 +1,4 @@
-﻿using System.Net.WebSockets;
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Mvc;
-using Pokedex.Library.Enums;
+﻿using Microsoft.AspNetCore.Mvc;
 using Pokedex.Library.Models;
 using Pokedex.Library.Processors;
 
@@ -13,13 +10,6 @@ namespace FunPokedex.WebAPI.Controllers
     [ApiController]
     public class FunPokedexController : ControllerBase
     {
-        // GET: api/<FunPokedexController>
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
-
         // GET api/<FunPokedexController>/5
         [HttpGet("{name}")]
         public async Task<PokemonBasicInfo> GetBasicInfo(string name)
@@ -69,24 +59,6 @@ namespace FunPokedex.WebAPI.Controllers
 
                 throw;
             }
-        }
-
-        // POST api/<FunPokedexController>
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
-
-        // PUT api/<FunPokedexController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/<FunPokedexController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
         }
     }
 }
