@@ -1,6 +1,7 @@
 ﻿using System.Net.WebSockets;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
+using Pokedex.Library.Enums;
 using Pokedex.Library.Models;
 using Pokedex.Library.Processors;
 
@@ -21,7 +22,7 @@ namespace FunPokedex.WebAPI.Controllers
 
         // GET api/<FunPokedexController>/5
         [HttpGet("{name}")]
-        public async Task<PokemonBasicInfo> Get(string name)
+        public async Task<PokemonBasicInfo> GetBasicInfo(string name)
         {
             try
             {
@@ -36,6 +37,32 @@ namespace FunPokedex.WebAPI.Controllers
                 var resultIsLegendary = species.is_legendary;
 
                 return new PokemonBasicInfo(name, resultDescription, resultHabitat, resultIsLegendary);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        [HttpGet("{name}/{translator}")]
+        public async Task<PokemonBasicInfo> GetBasicInfoTranslated(string name, string translator)
+        {
+            try
+            {
+                var pockemon = await PokemonProcessor.LoadPokemon(name);
+                var species = await PokemonProcessor.LoadSpecies(pockemon.id);
+
+                var resultName = pockemon.name;
+                var resultDescription = species.flavor_text_entries[0].flavor_text
+                    .Replace("\n", " ")
+                    .Replace("\f", "");
+                var resultHabitat = species.habitat.name;
+                var resultIsLegendary = species.is_legendary;
+
+                var translatedDescription = await TranslatorProcessor.LoadTranslation(resultDescription, translator);
+
+                return new PokemonBasicInfo(name, translatedDescription.contents.translated, resultHabitat, resultIsLegendary);
             }
             catch (Exception)
             {
