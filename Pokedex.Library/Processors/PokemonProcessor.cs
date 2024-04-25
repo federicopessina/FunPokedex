@@ -1,19 +1,20 @@
-﻿using Pokedex.Library.Models;
+﻿using PokemonModel = Pokedex.Library.Models.Pokemon.Rootobject;
+using SpeciesModel = Pokedex.Library.Models.Species.Rootobject;
 
 namespace Pokedex.Library.Processors
 {
-    public class PokemonProcessor
+    public static class PokemonProcessor
     {
-        private readonly string _baseUrl = "https://pokeapi.co/api/v2/pokemon/";
-        public async Task<Pokemon> LoadPokemon(string name)
+        public static async Task<PokemonModel> LoadPokemon(string name)
         {
+            const string _baseUrl = "https://pokeapi.co/api/v2/pokemon/";
             string url = $"{_baseUrl}/{name}";
 
             using (HttpResponseMessage response = await ApiHelper.ApiClient.GetAsync(url))
             {
                 if (response.IsSuccessStatusCode)
                 {
-                    Pokemon pokemon = await response.Content.ReadAsAsync<Pokemon>();
+                    PokemonModel pokemon = await response.Content.ReadAsAsync<PokemonModel>();
 
                     return await Task.FromResult(pokemon);
                 }
@@ -23,5 +24,25 @@ namespace Pokedex.Library.Processors
                 }
             }
         }
+
+        public static async Task<SpeciesModel> LoadSpecies(int id)
+        {
+            const string _baseUrl = "https://pokeapi.co/api/v2/pokemon-species/";
+            string url = $"{_baseUrl}/{id}";
+
+            using (HttpResponseMessage response = await ApiHelper.ApiClient.GetAsync(url))
+            {
+                if (response.IsSuccessStatusCode)
+                {
+                    SpeciesModel species = await response.Content.ReadAsAsync<SpeciesModel>();
+
+                    return await Task.FromResult(species);
+                }
+                else
+                {
+                    throw new Exception(response.ReasonPhrase);
+                }
+            }
+        }   
     }
 }

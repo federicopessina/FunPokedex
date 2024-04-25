@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Net.WebSockets;
+using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Mvc;
+using Pokedex.Library.Models;
+using Pokedex.Library.Processors;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -17,9 +21,27 @@ namespace FunPokedex.WebAPI.Controllers
 
         // GET api/<FunPokedexController>/5
         [HttpGet("{name}")]
-        public string Get(string name)
+        public async Task<PokemonBasicInfo> Get(string name)
         {
-            return "Fun Pokedex value";
+            try
+            {
+                var pokemon = await PokemonProcessor.LoadPokemon(name); // NOTE We need the pokemon ID to get the species.
+                var species = await PokemonProcessor.LoadSpecies(pokemon.id);
+                
+                var resultName = pokemon.name;
+                var resultDescription = species.flavor_text_entries[0].flavor_text
+                    .Replace("\n", " ")     // NOTE We need to replace the newline character with a space.
+                    .Replace("\f", "");     // NOTE We need to replace the \f escape character with an empty character. 
+                var resultHabitat = species.habitat.name;
+                var resultIsLegendary = species.is_legendary;
+
+                return new PokemonBasicInfo(name, resultDescription, resultHabitat, resultIsLegendary);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         // POST api/<FunPokedexController>
