@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FunPokedex.WebAPI.Enums;
+using Microsoft.AspNetCore.Mvc;
 using Pokedex.Library.Models;
 using Pokedex.Library.Processors;
 
@@ -35,8 +36,8 @@ namespace FunPokedex.WebAPI.Controllers
             }
         }
 
-        [HttpGet("{name}/{translator}")]
-        public async Task<PokemonBasicInfo> GetBasicInfoTranslated(string name, string translator)
+        [HttpGet("translated/{name}")]
+        public async Task<PokemonBasicInfo> GetBasicInfoTranslated(string name)
         {
             try
             {
@@ -49,7 +50,11 @@ namespace FunPokedex.WebAPI.Controllers
                     .Replace("\f", "");
                 var resultHabitat = species.habitat.name;
                 var resultIsLegendary = species.is_legendary;
-
+                
+                string translator = ETranslator.Shakespeare.ToString();
+                if (resultHabitat == "cave" || resultIsLegendary is true)
+                    translator = ETranslator.Yoda.ToString();
+                
                 var translatedDescription = await TranslatorProcessor.LoadTranslation(resultDescription, translator);
 
                 return new PokemonBasicInfo(name, translatedDescription.contents.translated, resultHabitat, resultIsLegendary);
